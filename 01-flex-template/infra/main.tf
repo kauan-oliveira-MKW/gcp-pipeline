@@ -19,8 +19,8 @@ resource "docker_image" "image" {
 
   build {
 
-    context    = "${path.module}/../src"
-    dockerfile = "${path.module}/../docker/Dockerfile"
+    context    = "${path.root}/../src"
+    dockerfile = "${path.root}/../docker/Dockerfile"
 
   }
 
