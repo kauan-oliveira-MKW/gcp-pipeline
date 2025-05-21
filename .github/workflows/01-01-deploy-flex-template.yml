@@ -15,8 +15,8 @@ jobs:
   build-deploy-flex-template:
     name: Build & Deploy Flex Template
     runs-on: ubuntu-latest
-    defaults:
-      run:
+    # defaults:
+      # run:
         # working-directory: 01-flex-template
 
     permissions:
