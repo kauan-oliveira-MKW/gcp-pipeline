@@ -52,6 +52,13 @@ jobs:
         env:
           TF_VAR_gcp_auth_token: ${{ steps.auth.outputs.access_token }}
 
+      - name: Check directory structure
+        run: |
+          ls -la
+          ls -la ../src
+          ls -la ../docker
+        working-directory: 01-flex-template/infra
+      
       # Builds or changes infrastructure
       - name: Terraform Apply
         run: terraform apply -auto-approve
