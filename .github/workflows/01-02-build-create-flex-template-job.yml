@@ -4,21 +4,21 @@ on: workflow_dispatch # to be triggered manually
 
 env:
   # Environment Variables for Building the Template JSON configuration file
-  TEMPLATE_GCS_PATH: gs://dataflow-bucket-gcp-practice-project-aman/templates/api_json_template.json
+  TEMPLATE_GCS_PATH: gs://primeiro-bucket-01/templates/api_json_template.json
   SDK_LANGUAGE: PYTHON
   GCR_IMAGE_PATH: us-central1-docker.pkg.dev/gcp-practice-project-aman/dataflow-templates/fpl-dataflow-template:v3
 
   # Environment Variables for Job Deployment
   JOB_NAME: fpl-api-template-test-v3
-  STAGING_LOCATION: gs://dataflow-bucket-gcp-practice-project-aman/staging
-  TEMP_LOCATION: gs://dataflow-bucket-gcp-practice-project-aman/temp
+  STAGING_LOCATION: gs://primeiro-bucket-01/staging
+  TEMP_LOCATION: gs://primeiro-bucket-01/temp
   REGION: us-central1
 
   # Environment Variables for Parameterizing the Dataflow Job
   API_ENDPOINT: https://fantasy.premierleague.com/api/fixtures/?event=4
   FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,stats
   DATASET: raw_layer
-  TABLE: fpl_dataflow_table_test
+  TABLE: fpl_dataflow_table_test  
 
 jobs:
   deploy-template:
