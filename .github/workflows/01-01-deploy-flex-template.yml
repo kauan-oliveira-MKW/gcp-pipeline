@@ -59,6 +59,13 @@ jobs:
           ls -la ../docker
         working-directory: 01-flex-template/infra
       
+      # Garante que o api artifact está habilitado
+      - name: Enable Artifact Registry API
+        run: |-
+          gcloud services enable artifactregistry.googleapis.com --project=${{ secrets.PROJECT_ID }}
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+      
       # Builds or changes infrastructure
       - name: Terraform Apply
         run: terraform apply -auto-approve
