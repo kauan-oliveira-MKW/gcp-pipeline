@@ -81,7 +81,7 @@ jobs:
 
       - name: Authenticate Docker to GCP
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login -u oauth2accesstoken --password-stdin https://southamerica-east1-docker.pkg.dev
+          echo "${{ steps.auth.outputs.access_token }}" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
       
       # Builds or changes infrastructure
       - name: Terraform Apply
