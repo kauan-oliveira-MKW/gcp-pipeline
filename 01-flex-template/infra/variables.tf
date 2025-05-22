@@ -13,7 +13,7 @@ variable "region" {
 variable "docker_address" {
   type        = string
   description = "Docker registry address"
-  default     = "southamerica-east1-docker.pkg.dev"
+  default     = "us-central1-docker.pkg.dev"
 }
 
 variable "docker_username" {
