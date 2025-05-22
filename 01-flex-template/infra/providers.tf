@@ -9,7 +9,7 @@ terraform {
 
   backend "gcs" {
 
-    bucket = "primeiro-bucket-01"
+    bucket = "primeiro-bucket-20240514"
     prefix = "dataflow/templates/fpl-pipeline"
 
   }
