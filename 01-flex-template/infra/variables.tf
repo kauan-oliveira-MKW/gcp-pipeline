@@ -1,7 +1,7 @@
 variable "project_id" {
   type        = string
   description = "Google project ID"
-  default     = "e2e-pipeline-202405"
+  default     = "e2e-pipeline-202406"
 }
 
 variable "region" {
