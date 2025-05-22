@@ -4,14 +4,14 @@ on: workflow_dispatch # to be triggered manually
 
 env:
   # Environment Variables for Building the Template JSON configuration file
-  TEMPLATE_GCS_PATH: gs://primeiro-bucket-01/templates/api_json_template.json
+  TEMPLATE_GCS_PATH: gs://primeiro-bucket-20240514/templates/api_json_template.json
   SDK_LANGUAGE: PYTHON
   GCR_IMAGE_PATH: us-central1-docker.pkg.dev/gcp-practice-project-aman/dataflow-templates/fpl-dataflow-template:v3
 
   # Environment Variables for Job Deployment
   JOB_NAME: fpl-api-template-test-v3
-  STAGING_LOCATION: gs://primeiro-bucket-01/staging
-  TEMP_LOCATION: gs://primeiro-bucket-01/temp
+  STAGING_LOCATION: gs://primeiro-bucket-20240514/staging
+  TEMP_LOCATION: gs://primeiro-bucket-20240514/temp
   REGION: us-central1
 
   # Environment Variables for Parameterizing the Dataflow Job
