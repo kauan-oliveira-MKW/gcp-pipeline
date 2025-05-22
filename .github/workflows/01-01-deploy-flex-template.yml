@@ -69,10 +69,10 @@ jobs:
       # Verifica e cria repositório
       - name: Setup Artifact Registry Repository
         run: |
-          if ! gcloud artifacts repositories list --location=us-central1 --filter="name~'dataflow-templates'" --format="value(name)" | grep -q "dataflow-templates"; then
+          if ! gcloud artifacts repositories list --location=southamerica-east1 --filter="name~'dataflow-templates'" --format="value(name)" | grep -q "dataflow-templates"; then
             gcloud artifacts repositories create dataflow-templates \
               --repository-format=docker \
-              --location=us-central1 \
+              --location=southamerica-east1 \
               --description="Dataflow templates repository"
           fi
         env:
@@ -81,7 +81,7 @@ jobs:
 
       - name: Authenticate Docker to GCP
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
+          echo "${{ steps.auth.outputs.access_token }}" | docker login -u oauth2accesstoken --password-stdin https://southamerica-east1-docker.pkg.dev
       
       # Builds or changes infrastructure
       - name: Terraform Apply
