@@ -45,6 +45,168 @@ jobs:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.SA_EMAIL }}
 
+      name: Build and Deploy Dataflow Flex Template
+
+on: workflow_dispatch # to be triggered manually
+
+env:
+  # Environment Variables for Building the Template JSON configuration file
+  TEMPLATE_GCS_PATH: gs://primeiro-bucket-20240514/templates/api_json_template.json
+  SDK_LANGUAGE: PYTHON
+  GCR_IMAGE_PATH: us-central1-docker.pkg.dev/gcp-practice-project-aman/dataflow-templates/fpl-dataflow-template:v3
+
+  # Environment Variables for Job Deployment
+  JOB_NAME: fpl-api-template-test-v3
+  STAGING_LOCATION: gs://primeiro-bucket-20240514/staging
+  TEMP_LOCATION: gs://primeiro-bucket-20240514/temp
+  REGION: us-central1
+
+  # Environment Variables for Parameterizing the Dataflow Job
+  API_ENDPOINT: https://fantasy.premierleague.com/api/fixtures/?event=4
+  FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,stats
+  DATASET: raw_layer
+  TABLE: fpl_dataflow_table_test  
+
+jobs:
+  deploy-template:
+    name: Dataflow Template
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 01-flex-template
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # authenticate with gcloud
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.SA_EMAIL }}
+name: Build and Deploy Dataflow Flex Template
+
+on: workflow_dispatch # to be triggered manually
+
+env:
+  # Environment Variables for Building the Template JSON configuration file
+  TEMPLATE_GCS_PATH: gs://primeiro-bucket-20240514/templates/api_json_template.json
+  SDK_LANGUAGE: PYTHON
+  GCR_IMAGE_PATH: us-central1-docker.pkg.dev/gcp-practice-project-aman/dataflow-templates/fpl-dataflow-template:v3
+
+  # Environment Variables for Job Deployment
+  JOB_NAME: fpl-api-template-test-v3
+  STAGING_LOCATION: gs://primeiro-bucket-20240514/staging
+  TEMP_LOCATION: gs://primeiro-bucket-20240514/temp
+  REGION: us-central1
+
+  # Environment Variables for Parameterizing the Dataflow Job
+  API_ENDPOINT: https://fantasy.premierleague.com/api/fixtures/?event=4
+  FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,stats
+  DATASET: raw_layer
+  TABLE: fpl_dataflow_table_test  
+
+jobs:
+  deploy-template:
+    name: Dataflow Template
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 01-flex-template
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # authenticate with gcloud
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.SA_EMAIL }}
+      - name: Ensure Staging Directory Exists
+        run: |
+          gsutil stat gs://$BUCKET_NAME/staging/ || gsutil mkdir gs://$BUCKET_NAME/staging/
+          gsutil stat gs://$BUCKET_NAME/temp/ || gsutil mkdir gs://$BUCKET_NAME/temp/
+        env:
+          BUCKET_NAME: "primeiro-bucket-20240514"  # Ou use um novo bucket
+      # Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      # Build the JSON Configuration file for the Dataflow Flex Template
+      - name: Build Dataflow Template JSON Configuration File
+        run: |
+          gcloud dataflow flex-template build \
+          ${{ env.TEMPLATE_GCS_PATH }} \
+          --sdk-language ${{ env.SDK_LANGUAGE }} \
+          --image ${{ env.GCR_IMAGE_PATH }}
+
+      - name: Grant Dataflow Permissions
+        run: |
+          # Apenas tenta adicionar permissões SE o SA já tiver direitos de IAM
+          gcloud projects add-iam-policy-binding ${{ secrets.PROJECT_ID }} \
+            --member="serviceAccount:${{ secrets.SA_EMAIL }}" \
+            --role="roles/dataflow.admin" || \
+            echo "⚠️ Não foi possível adicionar permissões. Verifique se o SA tem 'roles/resourcemanager.projectIamAdmin'"
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+
+      # Build and Deploy the Dataflow Job
+      - name: Build and Deploy Dataflow Job
+        run: |
+          gcloud dataflow flex-template run ${{ env.JOB_NAME }} \
+          --template-file-gcs-location ${{ env.TEMPLATE_GCS_PATH }} \
+          --region ${{ env.REGION }} \
+          --staging-location ${{ env.STAGING_LOCATION }} \
+          --temp-location ${{ env.TEMP_LOCATION }} \
+          --service-account-email ${{ secrets.SA_EMAIL }} \
+          --parameters ^~^apiEndpoint="${{ env.API_ENDPOINT }}"~fieldsToExtract="${{ env.FIELDS_TO_EXTRACT }}"~custom_gcs_temp_location="${{ env.TEMP_LOCATION }}"~dataset="${{ env.DATASET }}"~table="${{ env.TABLE }}"
+      # Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      # Build the JSON Configuration file for the Dataflow Flex Template
+      - name: Build Dataflow Template JSON Configuration File
+        run: |
+          gcloud dataflow flex-template build \
+          ${{ env.TEMPLATE_GCS_PATH }} \
+          --sdk-language ${{ env.SDK_LANGUAGE }} \
+          --image ${{ env.GCR_IMAGE_PATH }}
+
+      - name: Grant Dataflow Permissions
+        run: |
+          # Apenas tenta adicionar permissões SE o SA já tiver direitos de IAM
+          gcloud projects add-iam-policy-binding ${{ secrets.PROJECT_ID }} \
+            --member="serviceAccount:${{ secrets.SA_EMAIL }}" \
+            --role="roles/dataflow.admin" || \
+            echo "⚠️ Não foi possível adicionar permissões. Verifique se o SA tem 'roles/resourcemanager.projectIamAdmin'"
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+
+      # Build and Deploy the Dataflow Job
+      - name: Build and Deploy Dataflow Job
+        run: |
+          gcloud dataflow flex-template run ${{ env.JOB_NAME }} \
+          --template-file-gcs-location ${{ env.TEMPLATE_GCS_PATH }} \
+          --region ${{ env.REGION }} \
+          --staging-location ${{ env.STAGING_LOCATION }} \
+          --temp-location ${{ env.TEMP_LOCATION }} \
+          --service-account-email ${{ secrets.SA_EMAIL }} \
+          --parameters ^~^apiEndpoint="${{ env.API_ENDPOINT }}"~fieldsToExtract="${{ env.FIELDS_TO_EXTRACT }}"~custom_gcs_temp_location="${{ env.TEMP_LOCATION }}"~dataset="${{ env.DATASET }}"~table="${{ env.TABLE }}"
       # Set up Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
