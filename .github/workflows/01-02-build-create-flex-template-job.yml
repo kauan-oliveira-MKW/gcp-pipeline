@@ -45,6 +45,7 @@ jobs:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.SA_EMAIL }}
 
+      # === MODIFICAÇÃO SOLICITADA ===
       - name: Ensure Staging Directory Exists
         run: |
           gsutil ls ${{ env.STAGING_LOCATION }}/ || gsutil -m mkdir -p ${{ env.STAGING_LOCATION }}/
@@ -52,6 +53,7 @@ jobs:
           gsutil ls ${{ env.TEMPLATE_GCS_PATH | dirname }} || gsutil -m mkdir -p ${{ env.TEMPLATE_GCS_PATH | dirname }}
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+      # === FIM DA MODIFICAÇÃO ===
 
       # Set up Cloud SDK
       - name: Set up Cloud SDK
