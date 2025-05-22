@@ -7,7 +7,7 @@ variable "project_id" {
 variable "region" {
   type        = string
   description = "Google project region"
-  default     = "southamerica-east1"
+  default     = "us-central1"
 }
 
 variable "docker_address" {
