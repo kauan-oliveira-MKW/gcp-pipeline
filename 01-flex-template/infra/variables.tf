@@ -7,13 +7,13 @@ variable "project_id" {
 variable "region" {
   type        = string
   description = "Google project region"
-  default     = "us-central1"
+  default     = "southamerica-east1"
 }
 
 variable "docker_address" {
   type        = string
   description = "Docker registry address"
-  default     = "us-central1-docker.pkg.dev"
+  default     = "southamerica-east1-docker.pkg.dev"
 }
 
 variable "docker_username" {
