@@ -6,7 +6,7 @@ env:
   # Environment Variables for Building the Template JSON configuration file
   TEMPLATE_GCS_PATH: gs://primeiro-bucket-20240514/templates/api_json_template.json
   SDK_LANGUAGE: PYTHON
-  GCR_IMAGE_PATH: us-central1-docker.pkg.dev/gcp-practice-project-aman/dataflow-templates/fpl-dataflow-template:v3
+  GCR_IMAGE_PATH: us-central1-docker.pkg.dev/e2e-pipeline-202406/dataflow-templates/fpl-dataflow-template:v3
 
   # Environment Variables for Job Deployment
   JOB_NAME: fpl-api-template-test-v3
