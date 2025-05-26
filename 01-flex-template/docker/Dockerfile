@@ -1,4 +1,3 @@
-# set base image
 FROM gcr.io/dataflow-templates-base/python3-template-launcher-base
 
 ARG WORKDIR=/dataflow/template
@@ -13,10 +12,12 @@ COPY ./pipeline.py ${WORKDIR}/
 ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE="${WORKDIR}/requirements.txt"
 ENV FLEX_TEMPLATE_PYTHON_PY_FILE="${WORKDIR}/pipeline.py"
 
-# Install apache-beam and other dependencies to launch the pipeline
-RUN apt-get update
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install -U -r ${WORKDIR}/requirements.txt
+# Install build dependencies and update pip/setuptools/wheel
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python3-dev gcc cython && apt-get clean
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install python dependencies
+RUN pip install --no-cache-dir -U -r ${WORKDIR}/requirements.txt
 
 # Since we already downloaded all the dependencies, there's no need to rebuild everything.
 ENV PIP_NO_DEPS=True
