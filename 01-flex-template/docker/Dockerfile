@@ -1,22 +1,27 @@
-# set base image
+# Imagem base do Dataflow Flex Template
 FROM gcr.io/dataflow-templates-base/python3-template-launcher-base
 
+# Diretório de trabalho
 ARG WORKDIR=/dataflow/template
-RUN mkdir -p ${WORKDIR}
 WORKDIR ${WORKDIR}
+RUN mkdir -p ${WORKDIR}
 
-# copy files
-COPY ./requirements.txt ${WORKDIR}/
+# Copia o arquivo principal do pipeline
 COPY ./pipeline.py ${WORKDIR}/
 
-# set environment variables
-ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE="${WORKDIR}/requirements.txt"
+# Variáveis de ambiente exigidas pelo Dataflow Flex Template
+ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE=""
 ENV FLEX_TEMPLATE_PYTHON_PY_FILE="${WORKDIR}/pipeline.py"
 
-# Install apache-beam and other dependencies to launch the pipeline
-RUN apt-get update
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install -U -r ${WORKDIR}/requirements.txt
+# Atualiza pacotes do sistema e o pip
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && pip install --no-cache-dir --upgrade pip
 
-# Since we already downloaded all the dependencies, there's no need to rebuild everything.
+# Remove Apache Beam antigo da imagem base (caso esteja presente)
+RUN pip uninstall -y apache-beam || true
+
+# Instala explicitamente os pacotes desejados
+RUN pip install apache-beam[gcp]==2.65.0 requests==2.31.0
+
+# Evita reinstalação de dependências no runtime
 ENV PIP_NO_DEPS=True
