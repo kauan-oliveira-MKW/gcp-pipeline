@@ -23,5 +23,7 @@ RUN pip uninstall -y apache-beam || true
 # Instala explicitamente os pacotes desejados
 RUN pip install apache-beam[gcp]==2.65.0 requests==2.31.0
 
+RUN python -c "import apache_beam as beam; print('Apache Beam version:', beam.__version__)"
+
 # Evita reinstalação de dependências no runtime
 ENV PIP_NO_DEPS=True
