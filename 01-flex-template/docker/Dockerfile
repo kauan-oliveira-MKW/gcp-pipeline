@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Remove Apache Beam antigo da imagem base (caso esteja presente)
 RUN pip uninstall -y apache-beam || true
 
+RUN find / -type d -name "apache_beam*" -exec rm -rf {} +
+
 # Instala explicitamente os pacotes desejados
 RUN pip install apache-beam[gcp]==2.65.0 requests==2.31.0
 
