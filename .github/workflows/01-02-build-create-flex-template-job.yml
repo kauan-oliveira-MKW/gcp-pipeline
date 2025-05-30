@@ -16,7 +16,7 @@ env:
 
   # Environment Variables for Parameterizing the Dataflow Job
   API_ENDPOINT: https://fantasy.premierleague.com/api/fixtures/?event=4
-  FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,stats
+  FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,team_h,stats.identifier,stats.a,stats.h
   DATASET: raw_layer
   TABLE: fpl_dataflow_table_test  
 
