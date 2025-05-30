@@ -31,7 +31,9 @@ class CustomPipelineOptions(PipelineOptions):
         parser.add_value_provider_argument(
             "--table", help="BigQuery Table", required=True
         )
- 
+        parser.add_value_provider_argument(
+            "--eventNumber", help="Event number (round) of the data",required=True,
+        )
  
 # Classe para extrair campos, inclusive de listas
 class ExtractFields(beam.DoFn):
@@ -65,6 +67,14 @@ class ExtractFields(beam.DoFn):
                 return None
         return current
 
+class AddEventNumber(beam.DoFn):
+    def __init__(self, event_number):
+        self.event_number = event_number
+
+    def process(self, element):
+        new_element = dict(element)
+        new_element["event_number"] = self.event_number.get()
+        yield new_element
 
 # Classe nova para tratar campos complexos (como listas)
 class TransformComplexFields(beam.DoFn):
@@ -138,18 +148,19 @@ def run(argv=None):
     with beam.Pipeline(options=pipeline_options) as p:
         (
             p
-            | "🚀 Start Pipeline" >> beam.Create([custom_options.apiEndpoint])
-            | "🌐 Fetch API" >> beam.FlatMap(lambda url: fetch_api(url))
-            | "🧠 Extract Fields" >> beam.ParDo(ExtractFields(custom_options.fieldsToExtract))
-            | "🔧 Transform Complex Fields" >> beam.ParDo(TransformComplexFields())
-            | "⏰ Add Datetime and Date" >> beam.ParDo(AddDatetimeAndDate())
-            | "💾 Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table=custom_options.table,
-                dataset=custom_options.dataset,
+            | "Read API" >> beam.Create([custom_options.apiEndpoint.get()])
+            | "HTTP GET" >> beam.ParDo(lambda url: requests.get(url).json())
+            | "Extract Fields" >> beam.ParDo(ExtractFields(custom_options.fieldsToExtract.get()))
+            | "Add Event Number" >> beam.ParDo(AddEventNumber(custom_options.eventNumber))
+            | "Add Datetime and Date" >> beam.ParDo(AddDatetimeAndDate())
+            | "Write to BigQuery"
+            >> beam.io.WriteToBigQuery(
+                table=custom_options.table.get(),
+                dataset=custom_options.dataset.get(),
                 schema="SCHEMA_AUTODETECT",
                 create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-                write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND,
-                custom_gcs_temp_location=custom_options.custom_gcs_temp_location,
+                write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                custom_gcs_temp_location=custom_options.custom_gcs_temp_location.get(),
             )
         )
  

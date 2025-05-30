@@ -15,10 +15,10 @@ env:
   REGION: us-central1
 
   # Environment Variables for Parameterizing the Dataflow Job
-  API_ENDPOINT: https://fantasy.premierleague.com/api/fixtures/?event=4
   FIELDS_TO_EXTRACT: code,event,finished,kickoff_time,team_a,team_h,stats.identifier,stats.a,stats.h
   DATASET: raw_layer
-  TABLE: fpl_dataflow_table_test  
+  TABLE: fpl_dataflow_table_test
+  EVENT_NUMBER: 4  
 
 jobs:
   deploy-template:
@@ -68,9 +68,10 @@ jobs:
           CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
 
       # Build and Deploy the Dataflow Job
-      - name: 🚀 Run Dataflow Flex Template Job
+      - name: Build and Deploy Dataflow Job
         run: |
-          echo "🚀 Starting Dataflow Job: ${{ env.JOB_NAME }}"
+          API_ENDPOINT="https://fantasy.premierleague.com/api/fixtures/?event=${EVENT_NUMBER}"
+
           gcloud dataflow flex-template run ${{ env.JOB_NAME }} \
             --template-file-gcs-location ${{ env.TEMPLATE_GCS_PATH }} \
             --region ${{ env.REGION }} \
@@ -79,5 +80,4 @@ jobs:
             --service-account-email ${{ secrets.SA_EMAIL }} \
             --enable-streaming-engine \
             --additional-experiments=enable_stackdriver_agent_logs \
-            --parameters ^~^apiEndpoint="${{ env.API_ENDPOINT }}"~fieldsToExtract="${{ env.FIELDS_TO_EXTRACT }}"~custom_gcs_temp_location="${{ env.TEMP_LOCATION }}"~dataset="${{ env.DATASET }}"~table="${{ env.TABLE }}"
-          echo "✅ Dataflow Job started successfully"
+            --parameters ^~^apiEndpoint="$API_ENDPOINT"~fieldsToExtract="${{ env.FIELDS_TO_EXTRACT }}"~custom_gcs_temp_location="${{ env.TEMP_LOCATION }}"~dataset="${{ env.DATASET }}"~table="${{ env.TABLE }}"
