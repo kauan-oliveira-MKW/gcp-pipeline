@@ -151,6 +151,7 @@ def run(argv=None):
             | "Read API" >> beam.Create([custom_options.apiEndpoint.get()])
             | "HTTP GET" >> beam.ParDo(lambda url: requests.get(url).json())
             | "Extract Fields" >> beam.ParDo(ExtractFields(custom_options.fieldsToExtract.get()))
+            | "Transform Complex Fields" >> beam.ParDo(TransformComplexFields())
             | "Add Event Number" >> beam.ParDo(AddEventNumber(custom_options.eventNumber))
             | "Add Datetime and Date" >> beam.ParDo(AddDatetimeAndDate())
             | "Write to BigQuery"
